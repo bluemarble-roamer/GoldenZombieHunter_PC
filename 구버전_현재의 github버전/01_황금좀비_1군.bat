@@ -10,7 +10,7 @@ echo          1군
 echo ==============================
 echo.
 
-python main.py 1
+py main.py 1
 
 echo.
 echo 프로그램이 종료되었습니다.

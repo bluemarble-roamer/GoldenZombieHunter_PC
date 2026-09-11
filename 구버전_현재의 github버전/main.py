@@ -15,30 +15,10 @@ import requests
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR = os.path.join(BASE_DIR, "images")
 
-
-# ------------------------------------------------------------
-# 황금좀비 FAR 이미지 3종
-# ------------------------------------------------------------
-
-GOLDEN_ZOMBIE_FAR_01 = os.path.join(
+GOLDEN_ZOMBIE_FAR = os.path.join(
     IMAGE_DIR,
-    "golden_zombie_far_01.png"
+    "golden_zombie_far.png"
 )
-
-GOLDEN_ZOMBIE_FAR_02 = os.path.join(
-    IMAGE_DIR,
-    "golden_zombie_far_02.png"
-)
-
-GOLDEN_ZOMBIE_FAR_03 = os.path.join(
-    IMAGE_DIR,
-    "golden_zombie_far_03.png"
-)
-
-
-# ------------------------------------------------------------
-# 공격 / 출정
-# ------------------------------------------------------------
 
 ATTACK_BUTTON = os.path.join(
     IMAGE_DIR,
@@ -50,31 +30,10 @@ DISPATCH_BUTTON = os.path.join(
     "dispatch_button.png"
 )
 
-
-# ------------------------------------------------------------
-# 복귀 감지
-#
-# returning_face.png
-# = 현재 사용할 부대 영웅 얼굴
-#
-# returning_text.png
-# = "복귀 중" 글자
-# ------------------------------------------------------------
-
-RETURNING_FACE = os.path.join(
+RETURNING_IMAGE = os.path.join(
     IMAGE_DIR,
-    "returning_face.png"
+    "returning.png"
 )
-
-RETURNING_TEXT = os.path.join(
-    IMAGE_DIR,
-    "returning_text.png"
-)
-
-
-# ------------------------------------------------------------
-# 기타
-# ------------------------------------------------------------
 
 STAMINA_RECOVERY = os.path.join(
     IMAGE_DIR,
@@ -91,43 +50,15 @@ ZOMBIE_CHOICE = os.path.join(
 # 이미지 인식 기준값
 # ============================================================
 
-# 황금좀비 FAR
-FAR_THRESHOLD = 0.88
+# 정상 황금좀비 약 0.95
+# 빨간 일반좀비 오탐 약 0.7984
+FAR_THRESHOLD = 0.90
 
-# 공격 / 출정
 ATTACK_THRESHOLD = 0.75
 DISPATCH_THRESHOLD = 0.75
-
-# ------------------------------------------------------------
-# 복귀 감지
-# ------------------------------------------------------------
-
-# 영웅 얼굴
-RETURNING_FACE_THRESHOLD = 0.85
-
-# "복귀 중" 글자
-RETURNING_TEXT_THRESHOLD = 0.80
-
-# 기타
+RETURNING_THRESHOLD = 0.75
 STAMINA_THRESHOLD = 0.75
 ZOMBIE_CHOICE_THRESHOLD = 0.75
-
-
-# ============================================================
-# returning 글자 검색 범위
-#
-# 영웅 얼굴을 찾은 후
-# 얼굴 오른쪽 이 범위 안에서만 "복귀 중" 검색
-# ============================================================
-
-# 얼굴 오른쪽에서 얼마만큼 떨어진 곳부터 검색할지
-RETURNING_TEXT_X_OFFSET = 0
-
-# 얼굴 오른쪽으로 검색할 폭
-RETURNING_TEXT_SEARCH_WIDTH = 140
-
-# 얼굴 위/아래 여유
-RETURNING_TEXT_Y_MARGIN = 8
 
 
 # ============================================================
@@ -140,69 +71,43 @@ ZOOM_INTERVAL = 0.12
 
 # ============================================================
 # PC 게임창 기준 좌표
-#
-# 왼쪽 위     = (309, 51)
-# 오른쪽 아래 = (1915, 995)
-#
-# 중앙 = (1112, 523)
 # ============================================================
 
-GAME_CENTER_X = 1112
-GAME_CENTER_Y = 523
+# 줌인 후 황금좀비 위치
+GAME_CENTER_X = 1157
+GAME_CENTER_Y = 533
 
 
 # ============================================================
 # 부대 선택
 #
-# 1군 BAT → py main.py 1
-# 2군 BAT → py main.py 2
-# 3군 BAT → py main.py 3
+# 1군 BAT → python main.py 1
+# 2군 BAT → python main.py 2
 # ============================================================
 
 SQUAD_NUMBER = 1
 
-
 if len(sys.argv) >= 2:
-
     try:
-
-        SQUAD_NUMBER = int(
-            sys.argv[1]
-        )
-
+        SQUAD_NUMBER = int(sys.argv[1])
     except ValueError:
-
-        print(
-            "부대 번호는 1, 2 또는 3만 가능합니다."
-        )
-
+        print("부대 번호는 1 또는 2만 가능합니다.")
         sys.exit(1)
 
 
 if SQUAD_NUMBER == 1:
 
-    SQUAD_X = 952
-    SQUAD_Y = 911
-
+    SQUAD_X = 985
+    SQUAD_Y = 943
 
 elif SQUAD_NUMBER == 2:
 
-    SQUAD_X = 1055
-    SQUAD_Y = 911
-
-
-elif SQUAD_NUMBER == 3:
-
-    SQUAD_X = 1165
-    SQUAD_Y = 913
-
+    SQUAD_X = 1099
+    SQUAD_Y = 943
 
 else:
 
-    print(
-        "부대 번호는 1, 2 또는 3만 가능합니다."
-    )
-
+    print("부대 번호는 1 또는 2만 가능합니다.")
     sys.exit(1)
 
 
@@ -210,15 +115,19 @@ else:
 # 맵 드래그
 # ============================================================
 
-DRAG_START_X = 1112
-DRAG_START_Y = 523
+DRAG_START_X = 1157
+DRAG_START_Y = 533
 
+# 직접 테스트해서 확정한 거리
 DRAG_DISTANCE = 600
 
 DRAG_DURATION = 0.6
 
+# 드래그 후 화면 안정화
 AFTER_DRAG_WAIT = 0.8
 
+# 황금좀비가 없을 경우
+# 최대 5번 화면 이동
 MAX_DRAG_COUNT = 5
 
 
@@ -228,33 +137,34 @@ MAX_DRAG_COUNT = 5
 
 START_DELAY = 3.0
 
-# FAR 클릭 후 자동 줌인
+# far 황금좀비 클릭 → 자동 줌인
 AFTER_FAR_CLICK_WAIT = 1.2
 
-# 중앙 좀비 클릭 후 선택창 확인
+# 중앙 황금좀비 클릭 후
+# zombie_choice가 생길 시간을 약간 줌
 CHOICE_CHECK_WAIT = 0.4
 
-# 선택창 클릭 후
+# zombie_choice 클릭 후
 CHOICE_CLICK_WAIT = 0.4
 
 # 공격 버튼
 ATTACK_SEARCH_TIMEOUT = 3.0
 ATTACK_SEARCH_INTERVAL = 0.15
 
-# 공격 후 부대 선택 화면
+# 공격 버튼 클릭 후 부대 화면
 AFTER_ATTACK_WAIT = 1.5
 
 # 출정 버튼
 DISPATCH_SEARCH_TIMEOUT = 3.0
 DISPATCH_SEARCH_INTERVAL = 0.15
 
-# 출정 후 복귀감시 시작
+# 출정 이후 returning 감시 시작
 AFTER_DISPATCH_WAIT = 3.0
 
-# 복귀 확인 간격
+# returning 확인 간격
 RETURNING_CHECK_INTERVAL = 0.4
 
-# 복귀중 감지 후 다음 사냥
+# returning 발견 후 다음 사냥
 AFTER_RETURNING_WAIT = 1.2
 
 
@@ -272,11 +182,12 @@ NTFY_URL = (
 # PyAutoGUI 안전장치
 # ============================================================
 
+# 급할 때 마우스를 모니터 맨 왼쪽 위로 보내면 중단
 pyautogui.FAILSAFE = True
 
 
 # ============================================================
-# 체력 부족 알림
+# ntfy 체력부족 알림
 # ============================================================
 
 def send_stamina_alert():
@@ -356,25 +267,12 @@ def capture_screen():
 
 
 # ============================================================
-# 특정 화면 안에서 이미지 찾기
+# 이미지 찾기
 # ============================================================
 
-def find_template_in_screen(
-    screen,
-    template
-):
+def find_template(template):
 
-    screen_h, screen_w = screen.shape[:2]
-    template_h, template_w = template.shape[:2]
-
-    # 검색영역보다 템플릿이 큰 경우
-    if (
-        screen_w < template_w
-        or screen_h < template_h
-    ):
-
-        return 0, 0, -1.0
-
+    screen = capture_screen()
 
     result = cv2.matchTemplate(
         screen,
@@ -386,31 +284,19 @@ def find_template_in_screen(
         cv2.minMaxLoc(result)
     )
 
+    h, w = template.shape[:2]
+
     x = (
         max_location[0]
-        + template_w // 2
+        + w // 2
     )
 
     y = (
         max_location[1]
-        + template_h // 2
+        + h // 2
     )
 
     return x, y, max_score
-
-
-# ============================================================
-# 전체 화면에서 이미지 찾기
-# ============================================================
-
-def find_template(template):
-
-    screen = capture_screen()
-
-    return find_template_in_screen(
-        screen,
-        template
-    )
 
 
 # ============================================================
@@ -451,14 +337,12 @@ def wait_and_click(
 ):
 
     start_time = time.time()
-
     best_score = 0.0
 
     print(
         f"[대기탐색] {name} "
         f"최대 {timeout:.1f}초"
     )
-
 
     while (
         time.time() - start_time
@@ -498,9 +382,7 @@ def wait_and_click(
         )
 
         if score > best_score:
-
             best_score = score
-
 
         if score >= threshold:
 
@@ -520,7 +402,6 @@ def wait_and_click(
             )
 
             return "SUCCESS"
-
 
         time.sleep(
             interval
@@ -543,7 +424,6 @@ def wait_and_click(
 def zoom_out():
 
     print()
-
     print(
         f"[줌아웃] "
         f"{ZOOM_OUT_STEPS}단계 시작"
@@ -554,7 +434,6 @@ def zoom_out():
         GAME_CENTER_Y,
         duration=0.2
     )
-
 
     for i in range(
         ZOOM_OUT_STEPS
@@ -570,7 +449,6 @@ def zoom_out():
         time.sleep(
             ZOOM_INTERVAL
         )
-
 
     print(
         "[줌아웃] 완료"
@@ -589,7 +467,6 @@ def drag_map():
     )
 
     print()
-
     print(
         f"[맵이동] "
         f"({DRAG_START_X}, {DRAG_START_Y}) "
@@ -610,8 +487,7 @@ def drag_map():
     )
 
     print(
-        f"[맵이동] "
-        f"{DRAG_DISTANCE}px 드래그 완료"
+        "[맵이동] 600px 드래그 완료"
     )
 
     time.sleep(
@@ -620,94 +496,39 @@ def drag_map():
 
 
 # ============================================================
-# FAR 3종 중 가장 높은 점수 찾기
-# ============================================================
-
-def find_best_far_template(
-    far_templates
-):
-
-    screen = capture_screen()
-
-    best_x = 0
-    best_y = 0
-    best_score = -1.0
-    best_index = -1
-
-
-    for index, template in enumerate(
-        far_templates
-    ):
-
-        x, y, score = (
-            find_template_in_screen(
-                screen,
-                template
-            )
-        )
-
-        print(
-            f"[FAR 후보 {index + 1}] "
-            f"score={score:.4f} "
-            f"위치=({x}, {y})"
-        )
-
-
-        if score > best_score:
-
-            best_score = score
-            best_x = x
-            best_y = y
-            best_index = index
-
-
-    return (
-        best_x,
-        best_y,
-        best_score,
-        best_index
-    )
-
-
-# ============================================================
-# 황금좀비 FAR 찾기
+# 황금좀비 far 찾기
+#
+# 없으면 드래그 → 다시 검색
 # ============================================================
 
 def find_far_with_drag(
-    far_templates
+    far_template
 ):
 
     print()
-
     print(
         "[황금좀비] 줌아웃 아이콘 탐색"
     )
 
 
     # --------------------------------------------------------
-    # 현재 화면 검색
+    # 현재 화면 먼저 검색
     # --------------------------------------------------------
 
-    x, y, score, template_index = (
-        find_best_far_template(
-            far_templates
-        )
+    x, y, score = find_template(
+        far_template
     )
 
     print(
-        f"[탐색 결과] "
-        f"최고 FAR={template_index + 1} "
+        f"[탐색] golden_zombie_far "
         f"score={score:.4f}"
     )
-
 
     if score >= FAR_THRESHOLD:
 
         print(
             f"[성공] 황금좀비 발견 "
-            f"FAR={template_index + 1} "
-            f"위치=({x}, {y}) "
-            f"score={score:.4f}"
+            f"위치=({x}, {y})"
         )
 
         pyautogui.click(
@@ -723,7 +544,7 @@ def find_far_with_drag(
 
 
     # --------------------------------------------------------
-    # 없으면 드래그
+    # 없으면 드래그 반복
     # --------------------------------------------------------
 
     for drag_count in range(
@@ -732,7 +553,6 @@ def find_far_with_drag(
     ):
 
         print()
-
         print(
             f"[황금좀비 없음] "
             f"맵 이동 {drag_count}/"
@@ -741,27 +561,20 @@ def find_far_with_drag(
 
         drag_map()
 
-
-        x, y, score, template_index = (
-            find_best_far_template(
-                far_templates
-            )
+        x, y, score = find_template(
+            far_template
         )
 
         print(
-            f"[재탐색 결과] "
-            f"최고 FAR={template_index + 1} "
+            f"[재탐색] golden_zombie_far "
             f"score={score:.4f}"
         )
-
 
         if score >= FAR_THRESHOLD:
 
             print(
                 f"[성공] 황금좀비 발견 "
-                f"FAR={template_index + 1} "
-                f"위치=({x}, {y}) "
-                f"score={score:.4f}"
+                f"위치=({x}, {y})"
             )
 
             pyautogui.click(
@@ -777,7 +590,6 @@ def find_far_with_drag(
 
 
     print()
-
     print(
         "[실패] 맵 이동 후에도 "
         "황금좀비를 찾지 못했습니다."
@@ -788,6 +600,9 @@ def find_far_with_drag(
 
 # ============================================================
 # zombie_choice 확인
+#
+# 황금좀비와 다른 사물이 겹쳐있을 경우
+# "10레벨 침입 좀비" 선택창이 뜸
 # ============================================================
 
 def handle_zombie_choice(
@@ -808,7 +623,8 @@ def handle_zombie_choice(
         f"score={score:.4f}"
     )
 
-
+    # 선택창이 없다면
+    # 그냥 정상 상황
     if score < ZOMBIE_CHOICE_THRESHOLD:
 
         print(
@@ -818,6 +634,8 @@ def handle_zombie_choice(
         return False
 
 
+    # 선택창이 있다면
+    # 황금좀비 선택
     print(
         f"[선택창] 황금좀비 선택 "
         f"위치=({x}, {y})"
@@ -840,261 +658,45 @@ def handle_zombie_choice(
 
 
 # ============================================================
-# 지정 부대의 복귀 상태 확인
-#
-# 1. 화면 전체에서 returning_face.png 찾기
-#
-# 2. 찾은 얼굴 바로 오른쪽 영역에서
-#    returning_text.png ("복귀 중") 찾기
-#
-# 즉:
-#
-# 내 얼굴 + 행군 중
-# → 복귀 아님
-#
-# 다른 얼굴 + 복귀 중
-# → 복귀 아님
-#
-# 내 얼굴 + 복귀 중
-# → 복귀 감지
-# ============================================================
-
-def check_target_returning(
-    screen,
-    returning_face_template,
-    returning_text_template
-):
-
-    # --------------------------------------------------------
-    # 1. 영웅 얼굴 찾기
-    # --------------------------------------------------------
-
-    face_x, face_y, face_score = (
-        find_template_in_screen(
-            screen,
-            returning_face_template
-        )
-    )
-
-    print(
-        f"[복귀 얼굴] "
-        f"score={face_score:.4f}"
-    )
-
-
-    if face_score < RETURNING_FACE_THRESHOLD:
-
-        return (
-            False,
-            face_score,
-            -1.0
-        )
-
-
-    # --------------------------------------------------------
-    # 얼굴 위치 계산
-    # --------------------------------------------------------
-
-    face_h, face_w = (
-        returning_face_template.shape[:2]
-    )
-
-    face_left = (
-        face_x
-        - face_w // 2
-    )
-
-    face_top = (
-        face_y
-        - face_h // 2
-    )
-
-    face_right = (
-        face_left
-        + face_w
-    )
-
-    face_bottom = (
-        face_top
-        + face_h
-    )
-
-
-    screen_h, screen_w = (
-        screen.shape[:2]
-    )
-
-
-    # --------------------------------------------------------
-    # 2. 얼굴 오른쪽의 같은 행만 ROI로 설정
-    # --------------------------------------------------------
-
-    roi_x1 = max(
-        0,
-        face_right
-        + RETURNING_TEXT_X_OFFSET
-    )
-
-    roi_y1 = max(
-        0,
-        face_top
-        - RETURNING_TEXT_Y_MARGIN
-    )
-
-    roi_x2 = min(
-        screen_w,
-        roi_x1
-        + RETURNING_TEXT_SEARCH_WIDTH
-    )
-
-    roi_y2 = min(
-        screen_h,
-        face_bottom
-        + RETURNING_TEXT_Y_MARGIN
-    )
-
-
-    roi = screen[
-        roi_y1:roi_y2,
-        roi_x1:roi_x2
-    ]
-
-
-    # --------------------------------------------------------
-    # ROI 안에서 "복귀 중" 찾기
-    # --------------------------------------------------------
-
-    text_x, text_y, text_score = (
-        find_template_in_screen(
-            roi,
-            returning_text_template
-        )
-    )
-
-    print(
-        f"[복귀 글자] "
-        f"score={text_score:.4f}"
-    )
-
-
-    if text_score < RETURNING_TEXT_THRESHOLD:
-
-        return (
-            False,
-            face_score,
-            text_score
-        )
-
-
-    # --------------------------------------------------------
-    # 둘 다 성공
-    # --------------------------------------------------------
-
-    absolute_text_x = (
-        roi_x1
-        + text_x
-    )
-
-    absolute_text_y = (
-        roi_y1
-        + text_y
-    )
-
-
-    print(
-        f"[복귀 일치] "
-        f"얼굴=({face_x}, {face_y}) "
-        f"복귀중=({absolute_text_x}, "
-        f"{absolute_text_y})"
-    )
-
-
-    return (
-        True,
-        face_score,
-        text_score
-    )
-
-
-# ============================================================
 # returning 감시
 # ============================================================
 
 def wait_for_returning(
-    returning_face_template,
-    returning_text_template
+    returning_template
 ):
 
     print()
-
     print(
         "[복귀감시] "
-        "내 부대 얼굴 + 복귀 중 감시 시작"
+        "returning.png 감시 시작"
     )
-
-    print(
-        f"[복귀감시 기준] "
-        f"얼굴={RETURNING_FACE_THRESHOLD:.2f}, "
-        f"글자={RETURNING_TEXT_THRESHOLD:.2f}"
-    )
-
 
     check_count = 0
-
 
     while True:
 
         check_count += 1
 
-        screen = capture_screen()
-
-
-        returning, face_score, text_score = (
-            check_target_returning(
-                screen,
-                returning_face_template,
-                returning_text_template
-            )
+        x, y, score = find_template(
+            returning_template
         )
-
 
         print(
             f"[복귀대기] "
             f"{check_count}회 "
-            f"face={face_score:.4f} "
-            f"text={text_score:.4f}"
+            f"score={score:.4f}"
         )
 
-
-        if returning:
+        if score >= RETURNING_THRESHOLD:
 
             print()
-
-            print(
-                "=================================="
-            )
-
             print(
                 f"[복귀감지] "
-                f"{SQUAD_NUMBER}군 복귀 중!"
-            )
-
-            print(
-                f"얼굴 score="
-                f"{face_score:.4f}"
-            )
-
-            print(
-                f"글자 score="
-                f"{text_score:.4f}"
-            )
-
-            print(
-                "=================================="
+                f"returning 발견! "
+                f"score={score:.4f}"
             )
 
             return
-
 
         time.sleep(
             RETURNING_CHECK_INTERVAL
@@ -1106,12 +708,11 @@ def wait_for_returning(
 # ============================================================
 
 def hunt_one_zombie(
-    far_templates,
+    far_template,
     zombie_choice_template,
     attack_template,
     dispatch_template,
-    returning_face_template,
-    returning_text_template,
+    returning_template,
     stamina_template
 ):
 
@@ -1131,9 +732,8 @@ def hunt_one_zombie(
     # --------------------------------------------------------
 
     success = find_far_with_drag(
-        far_templates
+        far_template
     )
-
 
     if not success:
 
@@ -1141,7 +741,7 @@ def hunt_one_zombie(
 
 
     # --------------------------------------------------------
-    # 3. 자동 줌인 대기
+    # 3. 자동 줌인
     # --------------------------------------------------------
 
     print(
@@ -1172,6 +772,9 @@ def hunt_one_zombie(
 
     # --------------------------------------------------------
     # 5. 겹친 오브젝트 선택창 확인
+    #
+    # 있으면 zombie_choice 클릭
+    # 없으면 그냥 다음 단계
     # --------------------------------------------------------
 
     handle_zombie_choice(
@@ -1192,11 +795,9 @@ def hunt_one_zombie(
         stamina_template=stamina_template
     )
 
-
     if result == "STAMINA":
 
         return "STAMINA"
-
 
     if result != "SUCCESS":
 
@@ -1245,11 +846,9 @@ def hunt_one_zombie(
         stamina_template=stamina_template
     )
 
-
     if result == "STAMINA":
 
         return "STAMINA"
-
 
     if result != "SUCCESS":
 
@@ -1257,7 +856,6 @@ def hunt_one_zombie(
 
 
     print()
-
     print(
         f"[출정완료] "
         f"{SQUAD_NUMBER}군 황금좀비 공격 출발"
@@ -1265,7 +863,7 @@ def hunt_one_zombie(
 
 
     # --------------------------------------------------------
-    # 10. 출정 후 대기
+    # 10. 출정 후 3초 대기
     # --------------------------------------------------------
 
     print(
@@ -1280,12 +878,11 @@ def hunt_one_zombie(
 
 
     # --------------------------------------------------------
-    # 11. 지정 부대 복귀 감시
+    # 11. returning 감시
     # --------------------------------------------------------
 
     wait_for_returning(
-        returning_face_template,
-        returning_text_template
+        returning_template
     )
 
 
@@ -1313,25 +910,19 @@ def hunt_one_zombie(
 def main():
 
     print()
-
     print(
         "=================================="
     )
-
     print(
         " GoldenZombieHunter PC"
     )
-
     print(
         f" {SQUAD_NUMBER}군 자동사냥"
     )
-
     print(
         "=================================="
     )
-
     print()
-
 
     print(
         f"{START_DELAY:.0f}초 안에 "
@@ -1344,28 +935,12 @@ def main():
 
 
     # --------------------------------------------------------
-    # FAR 이미지 3개 로드
+    # 이미지 로드
     # --------------------------------------------------------
 
-    far_templates = [
-
-        load_template(
-            GOLDEN_ZOMBIE_FAR_01
-        ),
-
-        load_template(
-            GOLDEN_ZOMBIE_FAR_02
-        ),
-
-        load_template(
-            GOLDEN_ZOMBIE_FAR_03
-        ),
-    ]
-
-
-    # --------------------------------------------------------
-    # 기타 이미지 로드
-    # --------------------------------------------------------
+    far_template = load_template(
+        GOLDEN_ZOMBIE_FAR
+    )
 
     zombie_choice_template = load_template(
         ZOMBIE_CHOICE
@@ -1379,56 +954,12 @@ def main():
         DISPATCH_BUTTON
     )
 
-
-    # --------------------------------------------------------
-    # 복귀 이미지 로드
-    # --------------------------------------------------------
-
-    returning_face_template = load_template(
-        RETURNING_FACE
+    returning_template = load_template(
+        RETURNING_IMAGE
     )
-
-    returning_text_template = load_template(
-        RETURNING_TEXT
-    )
-
 
     stamina_template = load_template(
         STAMINA_RECOVERY
-    )
-
-
-    print()
-
-    print(
-        "[이미지 로드 완료]"
-    )
-
-    print(
-        " FAR 이미지 3종"
-    )
-
-    print(
-        " returning_face.png"
-    )
-
-    print(
-        " returning_text.png"
-    )
-
-    print(
-        f" FAR 기준="
-        f"{FAR_THRESHOLD:.2f}"
-    )
-
-    print(
-        f" 복귀 얼굴 기준="
-        f"{RETURNING_FACE_THRESHOLD:.2f}"
-    )
-
-    print(
-        f" 복귀 글자 기준="
-        f"{RETURNING_TEXT_THRESHOLD:.2f}"
     )
 
 
@@ -1438,34 +969,28 @@ def main():
 
     cycle = 0
 
-
     while True:
 
         cycle += 1
 
         print()
         print()
-
         print(
             "=================================="
         )
-
         print(
             f" 황금좀비 사냥 #{cycle}"
         )
-
         print(
             "=================================="
         )
 
-
         result = hunt_one_zombie(
-            far_templates,
+            far_template,
             zombie_choice_template,
             attack_template,
             dispatch_template,
-            returning_face_template,
-            returning_text_template,
+            returning_template,
             stamina_template
         )
 
@@ -1486,19 +1011,15 @@ def main():
         if result == "STAMINA":
 
             print()
-
             print(
                 "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             )
-
             print(
                 " 체력 부족으로 자동사냥 종료"
             )
-
             print(
                 " 폰 알림을 확인하세요."
             )
-
             print(
                 "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             )
@@ -1513,15 +1034,12 @@ def main():
         if result == "NO_ZOMBIE":
 
             print()
-
             print(
                 "=================================="
             )
-
             print(
                 " 황금좀비를 찾지 못해 종료"
             )
-
             print(
                 "=================================="
             )
@@ -1534,19 +1052,15 @@ def main():
         # ----------------------------------------------------
 
         print()
-
         print(
             "=================================="
         )
-
         print(
             " 진행 중 이미지 인식 실패"
         )
-
         print(
             " 자동사냥 종료"
         )
-
         print(
             "=================================="
         )
@@ -1559,5 +1073,4 @@ def main():
 # ============================================================
 
 if __name__ == "__main__":
-
     main()
